@@ -41,7 +41,7 @@ require (
 	github.com/hashicorp/errwrap v1.0.0
 	github.com/hashicorp/go-checkpoint v0.0.0-20171009173528-1545e56e46de
 	github.com/hashicorp/go-cleanhttp v0.5.0
-	github.com/hashicorp/go-getter v1.2.0
+	github.com/hashicorp/go-getter v1.2.1-0.20190508151202-fabb01671951
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/hashicorp/go-oracle-terraform v0.0.0-20181016190316-007121241b79
 	github.com/hashicorp/go-retryablehttp v0.5.2 // indirect

@@ -232,7 +232,7 @@ github.com/hashicorp/errwrap
 github.com/hashicorp/go-checkpoint
 # github.com/hashicorp/go-cleanhttp v0.5.0
 github.com/hashicorp/go-cleanhttp
-# github.com/hashicorp/go-getter v1.2.0
+# github.com/hashicorp/go-getter v1.2.1-0.20190508151202-fabb01671951
 github.com/hashicorp/go-getter
 github.com/hashicorp/go-getter/helper/url
 # github.com/hashicorp/go-immutable-radix v1.0.0
