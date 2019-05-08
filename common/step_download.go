@@ -51,6 +51,8 @@ type StepDownload struct {
 	Extension string
 }
 
+var defaultGetterClient = getter.Client{}
+
 func (s *StepDownload) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	ui := state.Get("ui").(packer.Ui)
 	defer ui.Say(fmt.Sprintf("leaving retrieve loop for %s", s.Description))
@@ -87,21 +89,6 @@ func (s *StepDownload) Run(ctx context.Context, state multistep.StateBag) multis
 	state.Put("error", err)
 	ui.Error(err.Error())
 	return multistep.ActionHalt
-}
-
-var (
-	getters = getter.Getters
-)
-
-func init() {
-	if runtime.GOOS == "windows" {
-		getters["file"] = &getter.FileGetter{
-			// always copy local files instead of symlinking to fix GH-7534. The
-			// longer term fix for this would be to change the go-getter so that it
-			// can leave the source file where it is & tell us where it is.
-			Copy: true,
-		}
-	}
 }
 
 func (s *StepDownload) download(ctx context.Context, ui packer.Ui, source string) (string, error) {
@@ -161,20 +148,21 @@ func (s *StepDownload) download(ctx context.Context, ui packer.Ui, source string
 	}
 
 	ui.Say(fmt.Sprintf("Trying %s", u.String()))
-	gc := getter.Client{
-		Ctx:              ctx,
+	req := &getter.Request{
 		Dst:              targetPath,
 		Src:              u.String(),
 		ProgressListener: ui,
 		Pwd:              wd,
-		Dir:              false,
-		Getters:          getters,
+		Mode:             getter.ModeFile,
+	}
+	if runtime.GOOS == "windows" {
+		req.Copy = true
 	}
 
-	switch err := gc.Get(); err.(type) {
+	switch op, err := defaultGetterClient.Get(ctx, req); err.(type) {
 	case nil: // success !
-		ui.Say(fmt.Sprintf("%s => %s", u.String(), targetPath))
-		return targetPath, nil
+		ui.Say(fmt.Sprintf("%s => %s", u.String(), op.Dst))
+		return op.Dst, nil
 	case *getter.ChecksumError:
 		ui.Say(fmt.Sprintf("Checksum did not match, removing %s", targetPath))
 		if err := os.Remove(targetPath); err != nil {
