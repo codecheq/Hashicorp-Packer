@@ -22,6 +22,17 @@ type StepProvision struct {
 	Comm packer.Communicator
 }
 
+func PopulateProvisionHookData(state multistep.StateBag) packer.ProvisionHookData {
+	hookData := packer.NewProvisionHookData()
+
+	// Add WinRMPassword to runtime data
+	WinRMPassword, ok := state.GetOk("winrm_password")
+	if ok {
+		hookData.WinRMPassword = WinRMPassword.(string)
+	}
+	return hookData
+}
+
 func (s *StepProvision) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	comm := s.Comm
 	if comm == nil {
@@ -30,15 +41,18 @@ func (s *StepProvision) Run(ctx context.Context, state multistep.StateBag) multi
 			comm = raw.(packer.Communicator)
 		}
 	}
+
 	hook := state.Get("hook").(packer.Hook)
 	ui := state.Get("ui").(packer.Ui)
+
+	hookData := PopulateProvisionHookData(state)
 
 	// Run the provisioner in a goroutine so we can continually check
 	// for cancellations...
 	log.Println("Running the provision hook")
 	errCh := make(chan error, 1)
 	go func() {
-		errCh <- hook.Run(ctx, packer.HookProvision, ui, comm, nil)
+		errCh <- hook.Run(ctx, packer.HookProvision, ui, comm, &hookData)
 	}()
 
 	for {
