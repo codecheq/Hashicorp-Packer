@@ -118,10 +118,10 @@ than the following two packages, you're encouraged to use whatever packages you
 want. Because plugins are their own processes, there is no danger of colliding
 dependencies.
 
--   `github.com/hashicorp/packer` - Contains all the interfaces that you have
+-   [github.com/hashicorp/packer](https://www.github.com/hashicorp/packer) - Contains all the interfaces that you have
     to implement for any given plugin.
 
--   `github.com/hashicorp/packer/packer/plugin` - Contains the code to serve
+-   [github.com/hashicorp/packer/plugin/example](https://github.com/hashicorp/packer/blob/master/plugin/example/main.go) - Contains the code to serve
     the plugin. This handles all the inter-process communication stuff.
 
 There are two steps involved in creating a plugin:
@@ -149,7 +149,7 @@ func main() {
 		panic(err)
 	}
 	server.RegisterBuilder(new(Builder))
-	server.Serve() 
+	server.Serve()
 }
 ```
 
