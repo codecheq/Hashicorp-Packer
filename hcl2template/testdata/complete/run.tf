@@ -1,3 +1,4 @@
+
 // starts resources to provision them.
 build {
     output "aws_ami" "{{user `image_name`}}-aws-ubuntu-16.04" {
@@ -18,7 +19,7 @@ build {
         from =  "packer-vmw-ubuntu-16.04"
     }
 
-    provisioners {
+    provision {
         shell {
             inline = [
                 "echo '{{user `my_secret`}}' :D"
@@ -38,8 +39,8 @@ build {
         upload "log.go" "/tmp" {
             timeout = "5s"
         }
-    }
 
+    }
 }
 
 build {

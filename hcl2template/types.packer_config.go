@@ -6,5 +6,5 @@ type PackerConfig struct {
 
 	Variables PackerV1Variables
 
-	Builds []Build
+	Builds Builds
 }

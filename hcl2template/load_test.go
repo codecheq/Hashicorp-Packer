@@ -9,9 +9,11 @@ import (
 
 func TestPackerConfig_Load(t *testing.T) {
 	type fields struct {
-		Sources   map[SourceRef]*Source
+		Sources map[SourceRef]*Source
+
 		Variables PackerV1Variables
-		Builds    []Build
+
+		Builds Builds
 	}
 	tests := []struct {
 		name             string
