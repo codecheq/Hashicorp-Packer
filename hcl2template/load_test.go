@@ -62,6 +62,13 @@ func TestPackerConfig_Load(t *testing.T) {
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1204",
 					},
+					SourceRef{
+						Type: "virtualbox-iso",
+						Name: "vb-ubuntu-1604",
+					}: &Source{
+						Type: "virtualbox-iso",
+						Name: "vb-ubuntu-1604",
+					},
 				},
 			},
 			true,
