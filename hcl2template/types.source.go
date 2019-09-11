@@ -75,17 +75,17 @@ func sourceRefFromAbsTraversal(t hcl.Traversal) (SourceRef, hcl.Diagnostics) {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
 			Summary:  "Invalid source reference",
-			Detail:   "An source reference must have three parts separated by periods: the keyword \"source\", the builder type name, and the source name.",
+			Detail:   "An source reference must have three parts separated by periods: the keyword \"" + sourceLabel + "\", the builder type name, and the source name.",
 			Subject:  t.SourceRange().Ptr(),
 		})
 		return NoSource, diags
 	}
 
-	if t.RootName() != "source" {
+	if t.RootName() != sourceLabel {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
 			Summary:  "Invalid source reference",
-			Detail:   "The first part of an source reference must be the keyword \"source\".",
+			Detail:   "The first part of an source reference must be the keyword \"" + sourceLabel + "\".",
 			Subject:  t[0].SourceRange().Ptr(),
 		})
 		return NoSource, diags

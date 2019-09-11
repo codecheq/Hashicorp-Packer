@@ -7,12 +7,14 @@ import (
 )
 
 const (
-	sourceLabel = "source"
+	sourceLabel    = "source"
+	variablesLabel = "variables"
 )
 
 var configSchema = &hcl.BodySchema{
 	Blocks: []hcl.BlockHeaderSchema{
 		{Type: sourceLabel, LabelNames: []string{"type", "name"}},
+		{Type: variablesLabel},
 	},
 }
 
@@ -20,9 +22,6 @@ var configSchema = &hcl.BodySchema{
 // errors, since a partial result can be useful for careful analysis by
 // development tools such as text editor extensions.
 func (cfg *PackerConfig) Load(filename string) hcl.Diagnostics {
-	if cfg.Sources == nil {
-		cfg.Sources = map[SourceRef]*Source{}
-	}
 
 	f, diags := parser.ParseFile(filename)
 	if diags.HasErrors() {
@@ -35,6 +34,9 @@ func (cfg *PackerConfig) Load(filename string) hcl.Diagnostics {
 	for _, block := range content.Blocks {
 		switch block.Type {
 		case sourceLabel:
+			if cfg.Sources == nil {
+				cfg.Sources = map[SourceRef]*Source{}
+			}
 			source := &Source{}
 			moreDiags := source.decodeConfig(block)
 			diags = append(diags, moreDiags...)
@@ -53,10 +55,15 @@ func (cfg *PackerConfig) Load(filename string) hcl.Diagnostics {
 				continue
 			}
 			cfg.Sources[ref] = source
+		case variablesLabel:
+			if cfg.Variables == nil {
+				cfg.Variables = PackerV1Variables{}
+			}
+
+			cfg.Variables.decodeConfig(block)
 
 		default:
-			// Only "source" is in our schema, so we can never get here
-			panic(fmt.Sprintf("unexpected block type %q", block.Type))
+			panic(fmt.Sprintf("unexpected block type %q", block.Type)) // TODO(azr): err
 		}
 	}
 

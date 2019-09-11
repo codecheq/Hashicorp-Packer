@@ -4,7 +4,7 @@ package hcl2template
 type PackerConfig struct {
 	Sources map[SourceRef]*Source
 
-	Variables []Variable
+	Variables PackerV1Variables
 
 	Builds []Build
 }
