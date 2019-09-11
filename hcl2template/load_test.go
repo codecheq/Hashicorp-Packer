@@ -22,7 +22,7 @@ func TestPackerConfig_Load(t *testing.T) {
 	}{
 		{
 			"valid " + sourceLabel + " load",
-			fields{}, "testdata/valid_sources/vb-iso.tf", &PackerConfig{
+			fields{}, "testdata/sources/vb-iso.tf", &PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
 						Type: "virtualbox-iso",
@@ -55,7 +55,7 @@ func TestPackerConfig_Load(t *testing.T) {
 						Name: "vb-ubuntu-1204",
 					},
 				},
-			}, "testdata/valid_sources/vb-iso.tf", &PackerConfig{
+			}, "testdata/sources/vb-iso.tf", &PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
 						Type: "virtualbox-iso",
@@ -77,7 +77,7 @@ func TestPackerConfig_Load(t *testing.T) {
 		},
 
 		{"valid variables load",
-			fields{}, "testdata/valid_variables/basic.tf", &PackerConfig{
+			fields{}, "testdata/variables/basic.tf", &PackerConfig{
 				Variables: PackerV1Variables{
 					"image_name": "foo-image-{{user `my_secret`}}",
 					"key":        "value",
