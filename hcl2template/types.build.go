@@ -5,20 +5,20 @@ import (
 )
 
 const (
-	outputLabel    = "output"
-	provisionLabel = "provision"
+	outputLabel        = "output"
+	provisionnersLabel = "provision"
 )
 
 var buildSchema = &hcl.BodySchema{
 	Blocks: []hcl.BlockHeaderSchema{
 		{Type: outputLabel, LabelNames: []string{"type", "name"}},
-		{Type: provisionLabel},
+		{Type: provisionnersLabel},
 	},
 }
 
 type Build struct {
 	// Ordered list of provisioner groups
-	// Provisioners []ProvisionerGroup
+	ProvisionerGroups ProvisionerGroups
 
 	// Ordered list of output stanzas
 	Outputs Outputs

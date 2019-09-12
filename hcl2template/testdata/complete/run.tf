@@ -6,6 +6,32 @@ build {
         // this creates a new resource with settings inherited from the source  
     }
 
+    provisioners {
+        shell {
+            inline = [
+                "echo '{{user `my_secret`}}' :D"
+            ]
+        }
+
+        shell {
+            script = [
+                "script-1.sh",
+                "script-2.sh",
+            ]
+            override "vmware-iso" {
+                execute_command = "echo 'password' | sudo -S bash {{.Path}}"
+            }
+        }
+
+        upload "log.go" "/tmp" {
+            timeout = "5s"
+        }
+
+    }
+}
+
+build {
+    
     output "aws_ami" "{{user `image_name`}}-vb-ubuntu-12.04" {
         from =  "vb-ubuntu-12.04" 
 
@@ -19,7 +45,7 @@ build {
         from =  "packer-vmw-ubuntu-16.04"
     }
 
-    provision {
+    provisioners {
         shell {
             inline = [
                 "echo '{{user `my_secret`}}' :D"
