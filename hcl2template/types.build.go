@@ -5,39 +5,43 @@ import (
 )
 
 const (
-	builderLabel      = "output"
-	provisionersLabel = "provisioners"
+	outputLabel    = "output"
+	provisionLabel = "provision"
 )
 
 var buildSchema = &hcl.BodySchema{
 	Blocks: []hcl.BlockHeaderSchema{
-		{Type: builderLabel, LabelNames: []string{"type", "name"}},
-		{Type: provisionersLabel},
+		{Type: outputLabel, LabelNames: []string{"type", "name"}},
+		{Type: provisionLabel},
 	},
 }
 
 type Build struct {
-	// Ordered list of provisioners
-	// Provisioners []Provisioner
+	// Ordered list of provisioner groups
+	// Provisioners []ProvisionerGroup
 
-	Outputs []Output
+	// Ordered list of output stanzas
+	Outputs Outputs
 
-	HCL2Ref HCL2Ref
-}
-
-type Output struct {
-	// Type of output; ex: amazon-ami
-	Type string
-	// Given name; if any
-	Name    string
 	HCL2Ref HCL2Ref
 }
 
 type Builds []Build
 
 func (builds *Builds) decodeConfig(block *hcl.Block) hcl.Diagnostics {
+	build := Build{}
 
-	block.Body.Content(buildSchema)
+	content, diags := block.Body.Content(buildSchema)
+	for _, block := range content.Blocks {
+		switch block.Type {
+		case outputLabel:
+			output := Output{}
+			moreDiags := output.decodeConfig(block)
+			diags = append(diags, moreDiags...)
+			build.Outputs = append(build.Outputs, output)
+		}
+	}
 
-	return nil
+	*builds = append((*builds), build)
+	return diags
 }

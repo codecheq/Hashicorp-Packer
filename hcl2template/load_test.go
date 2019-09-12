@@ -88,6 +88,38 @@ func TestPackerConfig_Load(t *testing.T) {
 			},
 			false,
 		},
+
+		{"valid " + buildLabel + " load",
+			fields{}, "testdata/build/basic.tf", &PackerConfig{
+				Builds: Builds{
+					Build{
+						Outputs: Outputs{
+							Output{
+								Type: "aws_ami",
+								Name: "{{user `image_name`}}-aws-ubuntu-16.04",
+							},
+							Output{
+								Type: "aws_ami",
+								Name: "{{user `image_name`}}-vb-ubuntu-12.04",
+							},
+							Output{
+								Type: "aws_ami",
+								Name: "{{user `image_name`}}-vmw-ubuntu-16.04",
+							},
+						},
+					},
+					Build{
+						Outputs: Outputs{
+							Output{
+								Type: "aws_ami",
+								Name: "fooooobaaaar",
+							},
+						},
+					},
+				},
+			},
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
