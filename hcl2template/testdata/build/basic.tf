@@ -16,6 +16,8 @@ build {
     }
 
     provision {
+        communicator = comm.ssh.vagrant
+
         shell {
             inline = [
                 "echo '{{user `my_secret`}}' :D"

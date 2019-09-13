@@ -7,4 +7,6 @@ type PackerConfig struct {
 	Variables PackerV1Variables
 
 	Builds Builds
+
+	Communicators []*Communicator
 }

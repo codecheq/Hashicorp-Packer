@@ -57,13 +57,25 @@ func TestParser_Parse(t *testing.T) {
 		},
 
 		{
+			"valid " + communicatorLabel + " load",
+			defaultParser,
+			args{"testdata/communicator/basic.tf", new(PackerConfig)},
+			&PackerConfig{
+				Communicators: []*Communicator{
+					{Type: "ssh", Name: "vagrant"},
+				},
+			},
+			false,
+		},
+
+		{
 			"duplicate " + sourceLabel, defaultParser,
 			args{"testdata/sources/vb-iso.tf", &PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1204",
-					}: &Source{
+					}: {
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1204",
 					},

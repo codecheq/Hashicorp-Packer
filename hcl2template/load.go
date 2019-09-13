@@ -79,6 +79,11 @@ func (p *Parser) Parse(filename string, cfg *PackerConfig) hcl.Diagnostics {
 			build, moreDiags := p.decodeBuildConfig(block)
 			diags = append(diags, moreDiags...)
 			cfg.Builds = append(cfg.Builds, build)
+		
+		case communicatorLabel:
+			communicator, moreDiags := p.decodeCommunicatorConfig(block)
+			diags = append(diags, moreDiags...)
+			cfg.Communicators = append(cfg.Communicators, communicator)
 
 		default:
 			panic(fmt.Sprintf("unexpected block type %q", block.Type)) // TODO(azr): err
