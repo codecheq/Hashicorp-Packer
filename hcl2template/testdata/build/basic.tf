@@ -15,10 +15,6 @@ build {
         }
     }
 
-    output "aws_ami" "{{user `image_name`}}-vmw-ubuntu-16.04" {
-        from =  "packer-vmw-ubuntu-16.04"
-    }
-
     provision {
         shell {
             inline = [

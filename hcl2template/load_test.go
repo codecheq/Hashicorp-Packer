@@ -10,6 +10,13 @@ import (
 )
 
 func TestParser_Parse(t *testing.T) {
+	defaultParser := &Parser{hclparse.NewParser(), &hcl.BodySchema{
+		Blocks: []hcl.BlockHeaderSchema{
+			{Type: "shell"},
+			{Type: "upload", LabelNames: []string{"source", "destination"}},
+		},
+	}}
+
 	type fields struct {
 		Parser *hclparse.Parser
 	}
@@ -110,9 +117,27 @@ func TestParser_Parse(t *testing.T) {
 								Type: "aws_ami",
 								Name: "{{user `image_name`}}-vb-ubuntu-12.04",
 							},
-							Output{
-								Type: "aws_ami",
-								Name: "{{user `image_name`}}-vmw-ubuntu-16.04",
+						},
+						ProvisionerGroups: ProvisionerGroups{
+							&ProvisionerGroup{
+								Provisioners: []Provisioner{
+									Provisioner{
+										&hcl.Block{
+											Type: "shell",
+										},
+									},
+									Provisioner{
+										&hcl.Block{
+											Type: "shell",
+										},
+									},
+									Provisioner{
+										&hcl.Block{
+											Type:   "upload",
+											Labels: []string{"log.go", "/tmp"},
+										},
+									},
+								},
 							},
 						},
 					},
@@ -121,6 +146,17 @@ func TestParser_Parse(t *testing.T) {
 							Output{
 								Type: "aws_ami",
 								Name: "fooooobaaaar",
+							},
+						},
+						ProvisionerGroups: ProvisionerGroups{
+							&ProvisionerGroup{
+								Provisioners: []Provisioner{
+									Provisioner{
+										&hcl.Block{
+											Type: "shell",
+										},
+									},
+								},
 							},
 						},
 					},
@@ -136,7 +172,13 @@ func TestParser_Parse(t *testing.T) {
 			if tt.wantDiags == (diags == nil) {
 				t.Errorf("PackerConfig.Load() unexpected diagnostics. %s", diags)
 			}
-			if diff := cmp.Diff(tt.args.cfg, tt.wantPackerConfig, cmpopts.IgnoreTypes(HCL2Ref{}), cmpopts.IgnoreInterfaces(struct{ hcl.Expression }{})); diff != "" {
+			if diff := cmp.Diff(tt.wantPackerConfig, tt.args.cfg,
+				cmpopts.IgnoreTypes(HCL2Ref{}),
+				cmpopts.IgnoreTypes([]hcl.Range{}),
+				cmpopts.IgnoreTypes(hcl.Range{}),
+				cmpopts.IgnoreInterfaces(struct{ hcl.Expression }{}),
+				cmpopts.IgnoreInterfaces(struct{ hcl.Body }{}),
+			); diff != "" {
 				t.Errorf("PackerConfig.Load() wrong packer config. %s", diff)
 			}
 			if t.Failed() {

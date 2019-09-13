@@ -5,23 +5,27 @@ import (
 	"github.com/hashicorp/hcl2/hcl"
 )
 
-type ProvisionerGroups []ProvisionerGroup
-
 type ProvisionerGroup struct {
 	Communicator hcl.Expression
 
-	HCL2Ref HCL2Ref
+	Provisioners []Provisioner
+	HCL2Ref      HCL2Ref
 }
 
-var provisionerGroupSchema = &hcl.BodySchema{
+type Provisioner struct {
+	*hcl.Block
+}
+
+var provisionerGroupSchema = hcl.BodySchema{
 	Blocks: []hcl.BlockHeaderSchema{},
 	Attributes: []hcl.AttributeSchema{
 		{"communicator", false},
 	},
 }
 
-func (provisionerGroup *ProvisionerGroup) decodeConfig(block *hcl.Block) hcl.Diagnostics {
-	provisionerGroup.HCL2Ref.DeclRange = block.DefRange
+type ProvisionerGroups []*ProvisionerGroup
+
+func (p *Parser) decodeProvisionerGroup(block *hcl.Block) (*ProvisionerGroup, hcl.Diagnostics) {
 
 	var b struct {
 		Communicator hcl.Expression `hcl:"communicator"`
@@ -30,7 +34,22 @@ func (provisionerGroup *ProvisionerGroup) decodeConfig(block *hcl.Block) hcl.Dia
 
 	diags := gohcl.DecodeBody(block.Body, nil, &b)
 
-	provisionerGroup.Communicator = b.Communicator
-	provisionerGroup.HCL2Ref.Remain = b.Remain
-	return diags
+	pg := &ProvisionerGroup{}
+	pg.Communicator = b.Communicator
+	pg.HCL2Ref.DeclRange = block.DefRange
+	pg.HCL2Ref.Remain = b.Remain
+
+	s := provisionerGroupSchema
+	s.Attributes = append(s.Attributes, p.ProvisionersSchema.Attributes...)
+	s.Blocks = append(s.Blocks, p.ProvisionersSchema.Blocks...)
+
+	content, moreDiags := pg.HCL2Ref.Remain.Content(&s)
+	diags = append(diags, moreDiags...)
+
+	for _, block := range content.Blocks {
+		p := Provisioner{block}
+		pg.Provisioners = append(pg.Provisioners, p)
+	}
+
+	return pg, diags
 }

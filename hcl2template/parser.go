@@ -7,10 +7,11 @@ import (
 	"github.com/hashicorp/hcl2/hclparse"
 )
 
-var defaultParser = &Parser{hclparse.NewParser()}
-
 type Parser struct {
 	*hclparse.Parser
+
+	// List of possible provisioners names.
+	ProvisionersSchema *hcl.BodySchema
 }
 
 func (p *Parser) ParseFile(filename string) (*hcl.File, hcl.Diagnostics) {
