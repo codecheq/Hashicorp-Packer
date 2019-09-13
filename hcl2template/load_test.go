@@ -40,14 +40,14 @@ func TestParser_Parse(t *testing.T) {
 					SourceRef{
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1204",
-					}: &Source{
+					}: {
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1204",
 					},
 					SourceRef{
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1604",
-					}: &Source{
+					}: {
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1604",
 					},
@@ -87,14 +87,14 @@ func TestParser_Parse(t *testing.T) {
 					SourceRef{
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1204",
-					}: &Source{
+					}: {
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1204",
 					},
 					SourceRef{
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1604",
-					}: &Source{
+					}: {
 						Type: "virtualbox-iso",
 						Name: "vb-ubuntu-1604",
 					},
@@ -119,13 +119,13 @@ func TestParser_Parse(t *testing.T) {
 			args{"testdata/build/basic.tf", new(PackerConfig)},
 			&PackerConfig{
 				Builds: Builds{
-					&Build{
+					{
 						Outputs: Outputs{
-							Output{
+							{
 								Type: "aws_ami",
 								Name: "{{user `image_name`}}-aws-ubuntu-16.04",
 							},
-							Output{
+							{
 								Type: "aws_ami",
 								Name: "{{user `image_name`}}-vb-ubuntu-12.04",
 							},
@@ -133,17 +133,17 @@ func TestParser_Parse(t *testing.T) {
 						ProvisionerGroups: ProvisionerGroups{
 							&ProvisionerGroup{
 								Provisioners: []Provisioner{
-									Provisioner{
+									{
 										&hcl.Block{
 											Type: "shell",
 										},
 									},
-									Provisioner{
+									{
 										&hcl.Block{
 											Type: "shell",
 										},
 									},
-									Provisioner{
+									{
 										&hcl.Block{
 											Type:   "upload",
 											Labels: []string{"log.go", "/tmp"},
@@ -155,15 +155,15 @@ func TestParser_Parse(t *testing.T) {
 					},
 					&Build{
 						Outputs: Outputs{
-							Output{
+							{
 								Type: "aws_ami",
 								Name: "fooooobaaaar",
 							},
 						},
 						ProvisionerGroups: ProvisionerGroups{
-							&ProvisionerGroup{
+							{
 								Provisioners: []Provisioner{
-									Provisioner{
+									{
 										&hcl.Block{
 											Type: "shell",
 										},
