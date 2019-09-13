@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/hcl2/hclparse"
 )
 
-var parser = &Parser{hclparse.NewParser()}
+var defaultParser = &Parser{hclparse.NewParser()}
 
 type Parser struct {
 	*hclparse.Parser

@@ -6,26 +6,29 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/hashicorp/hcl2/hcl"
+	"github.com/hashicorp/hcl2/hclparse"
 )
 
-func TestPackerConfig_Load(t *testing.T) {
+func TestParser_Parse(t *testing.T) {
 	type fields struct {
-		Sources map[SourceRef]*Source
-
-		Variables PackerV1Variables
-
-		Builds Builds
+		Parser *hclparse.Parser
+	}
+	type args struct {
+		filename string
+		cfg      *PackerConfig
 	}
 	tests := []struct {
 		name             string
-		fields           fields
-		filename         string
+		parser           *Parser
+		args             args
 		wantPackerConfig *PackerConfig
 		wantDiags        bool
 	}{
 		{
 			"valid " + sourceLabel + " load",
-			fields{}, "testdata/sources/vb-iso.tf", &PackerConfig{
+			defaultParser,
+			args{"testdata/sources/vb-iso.tf", new(PackerConfig)},
+			&PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
 						Type: "virtualbox-iso",
@@ -47,8 +50,8 @@ func TestPackerConfig_Load(t *testing.T) {
 		},
 
 		{
-			"duplicate " + sourceLabel,
-			fields{
+			"duplicate " + sourceLabel, defaultParser,
+			args{"testdata/sources/vb-iso.tf", &PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
 						Type: "virtualbox-iso",
@@ -58,7 +61,9 @@ func TestPackerConfig_Load(t *testing.T) {
 						Name: "vb-ubuntu-1204",
 					},
 				},
-			}, "testdata/sources/vb-iso.tf", &PackerConfig{
+			},
+			},
+			&PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
 						Type: "virtualbox-iso",
@@ -79,8 +84,9 @@ func TestPackerConfig_Load(t *testing.T) {
 			true,
 		},
 
-		{"valid variables load",
-			fields{}, "testdata/variables/basic.tf", &PackerConfig{
+		{"valid variables load", defaultParser,
+			args{"testdata/variables/basic.tf", new(PackerConfig)},
+			&PackerConfig{
 				Variables: PackerV1Variables{
 					"image_name": "foo-image-{{user `my_secret`}}",
 					"key":        "value",
@@ -90,10 +96,11 @@ func TestPackerConfig_Load(t *testing.T) {
 			false,
 		},
 
-		{"valid " + buildLabel + " load",
-			fields{}, "testdata/build/basic.tf", &PackerConfig{
+		{"valid " + buildLabel + " load", defaultParser,
+			args{"testdata/build/basic.tf", new(PackerConfig)},
+			&PackerConfig{
 				Builds: Builds{
-					Build{
+					&Build{
 						Outputs: Outputs{
 							Output{
 								Type: "aws_ami",
@@ -109,7 +116,7 @@ func TestPackerConfig_Load(t *testing.T) {
 							},
 						},
 					},
-					Build{
+					&Build{
 						Outputs: Outputs{
 							Output{
 								Type: "aws_ami",
@@ -124,16 +131,12 @@ func TestPackerConfig_Load(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg := &PackerConfig{
-				Sources:   tt.fields.Sources,
-				Variables: tt.fields.Variables,
-				Builds:    tt.fields.Builds,
-			}
-			diags := cfg.Load(tt.filename)
+			p := tt.parser
+			diags := p.Parse(tt.args.filename, tt.args.cfg)
 			if tt.wantDiags == (diags == nil) {
 				t.Errorf("PackerConfig.Load() unexpected diagnostics. %s", diags)
 			}
-			if diff := cmp.Diff(cfg, tt.wantPackerConfig, cmpopts.IgnoreTypes(HCL2Ref{}), cmpopts.IgnoreInterfaces(struct{ hcl.Expression }{})); diff != "" {
+			if diff := cmp.Diff(tt.args.cfg, tt.wantPackerConfig, cmpopts.IgnoreTypes(HCL2Ref{}), cmpopts.IgnoreInterfaces(struct{ hcl.Expression }{})); diff != "" {
 				t.Errorf("PackerConfig.Load() wrong packer config. %s", diff)
 			}
 			if t.Failed() {

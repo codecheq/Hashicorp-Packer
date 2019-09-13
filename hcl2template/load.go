@@ -22,15 +22,19 @@ var configSchema = &hcl.BodySchema{
 	},
 }
 
-// return as complete a config as we can manage, even if there are
+// Parse filename content into cfg.
+//
+// Parse may be called multiple times with the same cfg on a different file.
+//
+// Parse returns as complete a config as we can manage, even if there are
 // errors, since a partial result can be useful for careful analysis by
 // development tools such as text editor extensions.
-func (cfg *PackerConfig) Load(filename string) hcl.Diagnostics {
+func (p *Parser) Parse(filename string, cfg *PackerConfig) hcl.Diagnostics {
 	if cfg == nil {
 		cfg = &PackerConfig{}
 	}
 
-	f, diags := parser.ParseFile(filename)
+	f, diags := p.ParseFile(filename)
 	if diags.HasErrors() {
 		return diags
 	}
@@ -72,9 +76,9 @@ func (cfg *PackerConfig) Load(filename string) hcl.Diagnostics {
 			diags = append(diags, moreDiags...)
 
 		case buildLabel:
-
-			moreDiags := cfg.Builds.decodeConfig(block)
+			build, moreDiags := p.decodeBuildConfig(block)
 			diags = append(diags, moreDiags...)
+			cfg.Builds = append(cfg.Builds, build)
 
 		default:
 			panic(fmt.Sprintf("unexpected block type %q", block.Type)) // TODO(azr): err

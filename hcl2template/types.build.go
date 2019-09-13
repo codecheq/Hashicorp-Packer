@@ -26,10 +26,10 @@ type Build struct {
 	HCL2Ref HCL2Ref
 }
 
-type Builds []Build
+type Builds []*Build
 
-func (builds *Builds) decodeConfig(block *hcl.Block) hcl.Diagnostics {
-	build := Build{}
+func (p *Parser) decodeBuildConfig(block *hcl.Block) (*Build, hcl.Diagnostics) {
+	build := &Build{}
 
 	content, diags := block.Body.Content(buildSchema)
 	for _, block := range content.Blocks {
@@ -47,6 +47,5 @@ func (builds *Builds) decodeConfig(block *hcl.Block) hcl.Diagnostics {
 		}
 	}
 
-	*builds = append((*builds), build)
-	return diags
+	return build, diags
 }
