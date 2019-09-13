@@ -50,6 +50,8 @@ build {
     }
 
     provision {
+        communicator = comm.ssh.vagrant
+
         shell {
             inline = [
                 "echo HOLY GUACAMOLE !"

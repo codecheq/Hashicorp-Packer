@@ -26,7 +26,7 @@ func (source *Source) decodeConfig(block *hcl.Block) hcl.Diagnostics {
 	source.HCL2Ref.DeclRange = block.DefRange
 
 	var b struct {
-		Config hcl.Body `hcl:",remain"`
+		Remain hcl.Body `hcl:",remain"`
 	}
 	diags := gohcl.DecodeBody(block.Body, nil, &b)
 
@@ -48,7 +48,7 @@ func (source *Source) decodeConfig(block *hcl.Block) hcl.Diagnostics {
 		})
 	}
 
-	source.HCL2Ref.Config = b.Config
+	source.HCL2Ref.Remain = b.Remain
 
 	return diags
 }

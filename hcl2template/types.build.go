@@ -39,6 +39,11 @@ func (builds *Builds) decodeConfig(block *hcl.Block) hcl.Diagnostics {
 			moreDiags := output.decodeConfig(block)
 			diags = append(diags, moreDiags...)
 			build.Outputs = append(build.Outputs, output)
+		case provisionnersLabel:
+			pg := ProvisionerGroup{}
+			moreDiags := pg.decodeConfig(block)
+			diags = append(diags, moreDiags...)
+			build.ProvisionerGroups = append(build.ProvisionerGroups, pg)
 		}
 	}
 

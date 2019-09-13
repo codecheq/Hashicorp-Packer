@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/hashicorp/hcl2/hcl"
 )
 
 func TestPackerConfig_Load(t *testing.T) {
@@ -132,7 +133,7 @@ func TestPackerConfig_Load(t *testing.T) {
 			if tt.wantDiags == (diags == nil) {
 				t.Errorf("PackerConfig.Load() unexpected diagnostics. %s", diags)
 			}
-			if diff := cmp.Diff(cfg, tt.wantPackerConfig, cmpopts.IgnoreTypes(HCL2Ref{})); diff != "" {
+			if diff := cmp.Diff(cfg, tt.wantPackerConfig, cmpopts.IgnoreTypes(HCL2Ref{}), cmpopts.IgnoreInterfaces(struct{ hcl.Expression }{})); diff != "" {
 				t.Errorf("PackerConfig.Load() wrong packer config. %s", diff)
 			}
 			if t.Failed() {

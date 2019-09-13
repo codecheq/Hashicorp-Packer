@@ -7,6 +7,6 @@ type HCL2Ref struct {
 	// reference to the source definition in configuration text file
 	DeclRange hcl.Range
 
-	// TODO(adrien): WHAT IS THAT ?
-	Config hcl.Body
+	// remainder of unparsed body
+	Remain hcl.Body
 }
