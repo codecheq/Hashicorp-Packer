@@ -10,12 +10,18 @@ import (
 )
 
 func TestParser_Parse(t *testing.T) {
-	defaultParser := &Parser{hclparse.NewParser(), &hcl.BodySchema{
-		Blocks: []hcl.BlockHeaderSchema{
-			{Type: "shell"},
-			{Type: "upload", LabelNames: []string{"source", "destination"}},
-		},
-	}}
+	defaultParser := &Parser{
+		hclparse.NewParser(),
+		&hcl.BodySchema{
+			Blocks: []hcl.BlockHeaderSchema{
+				{Type: "shell"},
+				{Type: "upload", LabelNames: []string{"source", "destination"}},
+			}},
+		&hcl.BodySchema{
+			Blocks: []hcl.BlockHeaderSchema{
+				{Type: "amazon-import"},
+			}},
+	}
 
 	type fields struct {
 		Parser *hclparse.Parser
@@ -159,6 +165,17 @@ func TestParser_Parse(t *testing.T) {
 										&hcl.Block{
 											Type:   "upload",
 											Labels: []string{"log.go", "/tmp"},
+										},
+									},
+								},
+							},
+						},
+						PostProvisionerGroups: ProvisionerGroups{
+							&ProvisionerGroup{
+								Provisioners: []Provisioner{
+									{
+										&hcl.Block{
+											Type: "amazon-import",
 										},
 									},
 								},

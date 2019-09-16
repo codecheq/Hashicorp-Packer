@@ -12,6 +12,9 @@ type Parser struct {
 
 	// List of possible provisioners names.
 	ProvisionersSchema *hcl.BodySchema
+
+	// List of possible post-provisioners names.
+	PostProvisionersSchema *hcl.BodySchema
 }
 
 func (p *Parser) ParseFile(filename string) (*hcl.File, hcl.Diagnostics) {

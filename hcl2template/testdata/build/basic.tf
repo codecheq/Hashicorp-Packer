@@ -6,6 +6,7 @@ build {
     }
 
     from "src.virtualbox-iso.ubuntu-1204" {
+        // build name is defaulted from the label "src.virtualbox-iso.ubuntu-1204"
         outout_dir = "path/"
     }
 
@@ -32,6 +33,13 @@ build {
             timeout = "5s"
         }
 
+    }
+
+    post_provision {
+        amazon-import {
+            only = ["src.virtualbox-iso.ubuntu-1204"]
+            ami_name = "{{user `image_name`}-ubuntu-1.0"
+        }
     }
 }
 
