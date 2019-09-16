@@ -1,51 +1,18 @@
 
 // starts resources to provision them.
 build {
-    output "aws_ami" "{{user `image_name`}}-aws-ubuntu-16.04" {
-        from =  "aws-ubuntu-16.04" 
+    from src.amazon-ebs.ubuntu-1604 {
+        ami_name = "ami_name_blih_blah"
         // this creates a new resource with settings inherited from the source  
     }
 
-    provisioners {
-        shell {
-            inline = [
-                "echo '{{user `my_secret`}}' :D"
-            ]
-        }
-
-        shell {
-            script = [
-                "script-1.sh",
-                "script-2.sh",
-            ]
-            override "vmware-iso" {
-                execute_command = "echo 'password' | sudo -S bash {{.Path}}"
-            }
-        }
-
-        upload "log.go" "/tmp" {
-            timeout = "5s"
-        }
-
-    }
-}
-
-build {
-    
-    output "aws_ami" "{{user `image_name`}}-vb-ubuntu-12.04" {
-        from =  "vb-ubuntu-12.04" 
-
-        override_source_settings {
-            // resulting source will get settings from source + this setting :
-            ssh_username = "ubuntu"
-        }
+    from src.virtualbox-iso.ubuntu-1204 {
+        outout_dir = "path/"
     }
 
-    output "aws_ami" "{{user `image_name`}}-vmw-ubuntu-16.04" {
-        from =  "packer-vmw-ubuntu-16.04"
-    }
+    provision {
+        communicator = comm.ssh.vagrant
 
-    provisioners {
         shell {
             inline = [
                 "echo '{{user `my_secret`}}' :D"
@@ -71,11 +38,13 @@ build {
 
 build {
     // build an ami using the ami from the previous build block.
-    output "aws_ami" "fooooobaaaar" {
-        from = "{{user `image_name`}}-aws-ubuntu-16.04"
+    from "src.amazon.{{user `image_name`}-ubuntu-1.0" {
+        ami_name = "fooooobaaaar"
     }
 
-    provisioners {
+    provision {
+        communicator = comm.ssh.vagrant
+
         shell {
             inline = [
                 "echo HOLY GUACAMOLE !"

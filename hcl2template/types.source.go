@@ -39,14 +39,19 @@ func (source *Source) decodeConfig(block *hcl.Block) hcl.Diagnostics {
 			Subject: &block.LabelRanges[0],
 		})
 	}
-	if !hclsyntax.ValidIdentifier(source.Name) {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Invalid source name",
-			Detail:   "A " + sourceLabel + " name must start with a letter and may contain only letters, digits, underscores, and dashes.",
-			Subject:  &block.LabelRanges[1],
-		})
-	}
+
+	//
+	// TODO(azr): validate this later on; after interpolating pkr v1 variables
+	// ? or simply use HCL type variables ?
+	//
+	// if !hclsyntax.ValidIdentifier(source.Name) {
+	//  diags = append(diags, &hcl.Diagnostic{
+	//      Severity: hcl.DiagError,
+	//      Summary:  "Invalid source name",
+	//      Detail:   "A " + sourceLabel + " name must start with a letter and may contain only letters, digits, underscores, and dashes.",
+	//      Subject:  &block.LabelRanges[1],
+	//  })
+	// }
 
 	source.HCL2Ref.Remain = b.Remain
 

@@ -1,18 +1,12 @@
 
 // starts resources to provision them.
 build {
-    output "aws_ami" "{{user `image_name`}}-aws-ubuntu-16.04" {
-        from =  "aws-ubuntu-16.04" 
-        // this creates a new resource with settings inherited from the source  
+    from "src.amazon-ebs.ubuntu-1604" {
+        ami_name = "{{user `image_name`}-ubuntu-1.0"
     }
 
-    output "aws_ami" "{{user `image_name`}}-vb-ubuntu-12.04" {
-        from =  "vb-ubuntu-12.04" 
-
-        override_source_settings {
-            // resulting source will get settings from source + this setting :
-            ssh_username = "ubuntu"
-        }
+    from "src.virtualbox-iso.ubuntu-1204" {
+        outout_dir = "path/"
     }
 
     provision {
@@ -43,8 +37,8 @@ build {
 
 build {
     // build an ami using the ami from the previous build block.
-    output "aws_ami" "fooooobaaaar" {
-        from = "{{user `image_name`}}-aws-ubuntu-16.04"
+    from "src.amazon.{{user `image_name`}-ubuntu-1.0" {
+        ami_name = "fooooobaaaar"
     }
 
     provision {

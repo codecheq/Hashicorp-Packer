@@ -5,14 +5,14 @@ import (
 )
 
 const (
-	outputLabel        = "output"
-	provisionnersLabel = "provision"
+	buildFromLabel          = "from"
+	buildProvisionnersLabel = "provision"
 )
 
 var buildSchema = &hcl.BodySchema{
 	Blocks: []hcl.BlockHeaderSchema{
-		{Type: outputLabel, LabelNames: []string{"type", "name"}},
-		{Type: provisionnersLabel},
+		{Type: buildFromLabel, LabelNames: []string{"src"}},
+		{Type: buildProvisionnersLabel},
 	},
 }
 
@@ -21,7 +21,7 @@ type Build struct {
 	ProvisionerGroups ProvisionerGroups
 
 	// Ordered list of output stanzas
-	Outputs Outputs
+	Froms BuildFromList
 
 	HCL2Ref HCL2Ref
 }
@@ -34,12 +34,12 @@ func (p *Parser) decodeBuildConfig(block *hcl.Block) (*Build, hcl.Diagnostics) {
 	content, diags := block.Body.Content(buildSchema)
 	for _, block := range content.Blocks {
 		switch block.Type {
-		case outputLabel:
-			output := Output{}
-			moreDiags := output.decodeConfig(block)
+		case buildFromLabel:
+			bf := BuildFrom{}
+			moreDiags := bf.decodeConfig(block)
 			diags = append(diags, moreDiags...)
-			build.Outputs = append(build.Outputs, output)
-		case provisionnersLabel:
+			build.Froms = append(build.Froms, bf)
+		case buildProvisionnersLabel:
 			pg, moreDiags := p.decodeProvisionerGroup(block)
 			diags = append(diags, moreDiags...)
 			build.ProvisionerGroups = append(build.ProvisionerGroups, pg)

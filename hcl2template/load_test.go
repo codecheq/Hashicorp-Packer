@@ -34,22 +34,29 @@ func TestParser_Parse(t *testing.T) {
 		{
 			"valid " + sourceLabel + " load",
 			defaultParser,
-			args{"testdata/sources/vb-iso.tf", new(PackerConfig)},
+			args{"testdata/sources/basic.tf", new(PackerConfig)},
 			&PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
 						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1204",
+						Name: "ubuntu-1204",
 					}: {
 						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1204",
+						Name: "ubuntu-1204",
 					},
 					SourceRef{
-						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1604",
+						Type: "amazon-ebs",
+						Name: "ubuntu-1604",
 					}: {
-						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1604",
+						Type: "amazon-ebs",
+						Name: "ubuntu-1604",
+					},
+					SourceRef{
+						Type: "amazon-ebs",
+						Name: "{{user `image_name`}}-ubuntu-1.0",
+					}: {
+						Type: "amazon-ebs",
+						Name: "{{user `image_name`}}-ubuntu-1.0",
 					},
 				},
 			},
@@ -70,14 +77,14 @@ func TestParser_Parse(t *testing.T) {
 
 		{
 			"duplicate " + sourceLabel, defaultParser,
-			args{"testdata/sources/vb-iso.tf", &PackerConfig{
+			args{"testdata/sources/basic.tf", &PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
-						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1204",
+						Type: "amazon-ebs",
+						Name: "ubuntu-1604",
 					}: {
-						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1204",
+						Type: "amazon-ebs",
+						Name: "ubuntu-1604",
 					},
 				},
 			},
@@ -86,17 +93,24 @@ func TestParser_Parse(t *testing.T) {
 				Sources: map[SourceRef]*Source{
 					SourceRef{
 						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1204",
+						Name: "ubuntu-1204",
 					}: {
 						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1204",
+						Name: "ubuntu-1204",
 					},
 					SourceRef{
-						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1604",
+						Type: "amazon-ebs",
+						Name: "ubuntu-1604",
 					}: {
-						Type: "virtualbox-iso",
-						Name: "vb-ubuntu-1604",
+						Type: "amazon-ebs",
+						Name: "ubuntu-1604",
+					},
+					SourceRef{
+						Type: "amazon-ebs",
+						Name: "{{user `image_name`}}-ubuntu-1.0",
+					}: {
+						Type: "amazon-ebs",
+						Name: "{{user `image_name`}}-ubuntu-1.0",
 					},
 				},
 			},
@@ -120,14 +134,12 @@ func TestParser_Parse(t *testing.T) {
 			&PackerConfig{
 				Builds: Builds{
 					{
-						Outputs: Outputs{
+						Froms: BuildFromList{
 							{
-								Type: "aws_ami",
-								Name: "{{user `image_name`}}-aws-ubuntu-16.04",
+								Src: "src.amazon-ebs.ubuntu-1604",
 							},
 							{
-								Type: "aws_ami",
-								Name: "{{user `image_name`}}-vb-ubuntu-12.04",
+								Src: "src.virtualbox-iso.ubuntu-1204",
 							},
 						},
 						ProvisionerGroups: ProvisionerGroups{
@@ -154,10 +166,9 @@ func TestParser_Parse(t *testing.T) {
 						},
 					},
 					&Build{
-						Outputs: Outputs{
+						Froms: BuildFromList{
 							{
-								Type: "aws_ami",
-								Name: "fooooobaaaar",
+								Src: "src.amazon.{{user `image_name`}-ubuntu-1.0",
 							},
 						},
 						ProvisionerGroups: ProvisionerGroups{
