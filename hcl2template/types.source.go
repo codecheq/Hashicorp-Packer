@@ -33,7 +33,7 @@ func (source *Source) decodeConfig(block *hcl.Block) hcl.Diagnostics {
 	if !hclsyntax.ValidIdentifier(source.Type) {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
-			Summary:  "Invalid builder type",
+			Summary:  "Invalid " + sourceLabel + " type",
 			Detail: "A " + sourceLabel + " type must start with a letter and " +
 				"may contain only letters, digits, underscores, and dashes.",
 			Subject: &block.LabelRanges[0],
