@@ -40,7 +40,7 @@ func TestParser_Parse(t *testing.T) {
 		{
 			"valid " + sourceLabel + " load",
 			defaultParser,
-			args{"testdata/sources/basic.tf", new(PackerConfig)},
+			args{"testdata/sources/basic.pkr.hcl", new(PackerConfig)},
 			&PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
@@ -72,7 +72,7 @@ func TestParser_Parse(t *testing.T) {
 		{
 			"valid " + communicatorLabel + " load",
 			defaultParser,
-			args{"testdata/communicator/basic.tf", new(PackerConfig)},
+			args{"testdata/communicator/basic.pkr.hcl", new(PackerConfig)},
 			&PackerConfig{
 				Communicators: []*Communicator{
 					{Type: "ssh", Name: "vagrant"},
@@ -83,7 +83,7 @@ func TestParser_Parse(t *testing.T) {
 
 		{
 			"duplicate " + sourceLabel, defaultParser,
-			args{"testdata/sources/basic.tf", &PackerConfig{
+			args{"testdata/sources/basic.pkr.hcl", &PackerConfig{
 				Sources: map[SourceRef]*Source{
 					SourceRef{
 						Type: "amazon-ebs",
@@ -124,7 +124,7 @@ func TestParser_Parse(t *testing.T) {
 		},
 
 		{"valid variables load", defaultParser,
-			args{"testdata/variables/basic.tf", new(PackerConfig)},
+			args{"testdata/variables/basic.pkr.hcl", new(PackerConfig)},
 			&PackerConfig{
 				Variables: PackerV1Variables{
 					"image_name": "foo-image-{{user `my_secret`}}",
@@ -136,7 +136,7 @@ func TestParser_Parse(t *testing.T) {
 		},
 
 		{"valid " + buildLabel + " load", defaultParser,
-			args{"testdata/build/basic.tf", new(PackerConfig)},
+			args{"testdata/build/basic.pkr.hcl", new(PackerConfig)},
 			&PackerConfig{
 				Builds: Builds{
 					{
