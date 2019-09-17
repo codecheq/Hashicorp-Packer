@@ -208,7 +208,7 @@ func TestParser_Parse(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := tt.parser
-			diags := p.Parse(tt.args.filename, tt.args.cfg)
+			diags := p.ParseFile(tt.args.filename, tt.args.cfg)
 			if tt.wantDiags == (diags == nil) {
 				t.Errorf("PackerConfig.Load() unexpected diagnostics. %s", diags)
 			}

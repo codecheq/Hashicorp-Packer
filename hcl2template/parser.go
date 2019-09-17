@@ -32,29 +32,29 @@ type Parser struct {
 
 	// List of possible post-provisioners names.
 	PostProvisionersSchema *hcl.BodySchema
-} 
+}
 
 func (p *Parser) Parso(filename string) (*PackerConfig, hcl.Diagnostics) {
 	return nil, nil
 }
 
-// Parse filename content into cfg.
+// ParseFile filename content into cfg.
 //
-// Parse may be called multiple times with the same cfg on a different file.
+// ParseFile may be called multiple times with the same cfg on a different file.
 //
-// Parse returns as complete a config as we can manage, even if there are
+// ParseFile returns as complete a config as we can manage, even if there are
 // errors, since a partial result can be useful for careful analysis by
 // development tools such as text editor extensions.
-func (p *Parser) Parse(filename string, cfg *PackerConfig) hcl.Diagnostics {
+func (p *Parser) ParseFile(filename string, cfg *PackerConfig) hcl.Diagnostics {
 	if cfg == nil {
 		cfg = &PackerConfig{}
-	} 
+	}
 
 	var f *hcl.File
-	var diags hcl.Diagnostics 
+	var diags hcl.Diagnostics
 	if strings.HasSuffix(filename, ".json") {
-		f, diags =  p.ParseJSONFile(filename)
-	} else { 
+		f, diags = p.ParseJSONFile(filename)
+	} else {
 		f, diags = p.ParseHCLFile(filename)
 	}
 	if diags.HasErrors() {
