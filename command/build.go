@@ -124,7 +124,7 @@ func (c *BuildCommand) RunContext(buildCtx context.Context, args []string) int {
 	var tpl *template.Template
 	if strings.HasSuffix(cfg.Path, hcl2FileExt) || isDir(cfg.Path) {
 		hcl2Cfg := c.getHCL2Parser()
-		hcl2tpl, diags := hcl2Cfg.Parso(cfg.Path)
+		hcl2tpl, diags := hcl2Cfg.Parse(cfg.Path)
 		if diags.HasErrors() {
 			c.Ui.Error(fmt.Sprintf("Failed to parse template: %s", diags))
 			return 1

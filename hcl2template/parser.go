@@ -2,6 +2,8 @@ package hcl2template
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/hashicorp/hcl2/hcl"
@@ -34,8 +36,75 @@ type Parser struct {
 	PostProvisionersSchema *hcl.BodySchema
 }
 
-func (p *Parser) Parso(filename string) (*PackerConfig, hcl.Diagnostics) {
-	return nil, nil
+const hcl2FileExt = ".pkr.hcl"
+
+func isDir(path string) bool {
+	f, err := os.Open(path)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+	s, err := f.Stat()
+	if err != nil {
+		return false
+	}
+	return s.IsDir()
+}
+
+func (p *Parser) Parse(filename string) (*PackerConfig, hcl.Diagnostics) {
+	var cfg *PackerConfig
+	var diags hcl.Diagnostics
+
+	hclFiles := []string{}
+	jsonFiles := []string{}
+	if strings.HasSuffix(filename, hcl2FileExt) {
+		hclFiles = append(hclFiles, hcl2FileExt)
+	} else if strings.HasSuffix(filename, ".json") {
+		jsonFiles = append(jsonFiles, hcl2FileExt)
+	} else {
+		fileInfos, err := ioutil.ReadDir(filename)
+		if err != nil {
+			diag := &hcl.Diagnostic{
+				Severity: hcl.DiagError,
+				Summary:  "Cannot read hcl directory",
+				Detail:   err.Error(),
+			}
+			diags = append(diags, diag)
+		}
+		for _, fileInfo := range fileInfos {
+			filename := fileInfo.Name()
+			if strings.HasSuffix(filename, hcl2FileExt) {
+				hclFiles = append(hclFiles, hcl2FileExt)
+			} else if strings.HasSuffix(filename, ".json") {
+				jsonFiles = append(jsonFiles, hcl2FileExt)
+			}
+		}
+	}
+
+	var files []*hcl.File
+	for _, filename := range hclFiles {
+		f, moreDiags := p.ParseHCLFile(filename)
+		diags = append(diags, moreDiags...)
+		files = append(files, f)
+	}
+	for _, filename := range jsonFiles {
+		f, moreDiags := p.ParseJSONFile(filename)
+		diags = append(diags, moreDiags...)
+		files = append(files, f)
+	}
+	if diags.HasErrors() {
+		return cfg, diags
+	}
+
+	for _, file := range files {
+		moreDiags := p.ParseFile(file, cfg)
+		diags = append(diags, moreDiags...)
+	}
+	if diags.HasErrors() {
+		return cfg, diags
+	}
+
+	return cfg, nil
 }
 
 // ParseFile filename content into cfg.
@@ -45,21 +114,12 @@ func (p *Parser) Parso(filename string) (*PackerConfig, hcl.Diagnostics) {
 // ParseFile returns as complete a config as we can manage, even if there are
 // errors, since a partial result can be useful for careful analysis by
 // development tools such as text editor extensions.
-func (p *Parser) ParseFile(filename string, cfg *PackerConfig) hcl.Diagnostics {
+func (p *Parser) ParseFile(f *hcl.File, cfg *PackerConfig) hcl.Diagnostics {
 	if cfg == nil {
 		cfg = &PackerConfig{}
 	}
 
-	var f *hcl.File
 	var diags hcl.Diagnostics
-	if strings.HasSuffix(filename, ".json") {
-		f, diags = p.ParseJSONFile(filename)
-	} else {
-		f, diags = p.ParseHCLFile(filename)
-	}
-	if diags.HasErrors() {
-		return diags
-	}
 
 	content, moreDiags := f.Body.Content(configSchema)
 	diags = append(diags, moreDiags...)
