@@ -25,10 +25,10 @@ source "amazon-ebs" "ubuntu-1604" {
             "099720109477"
         ]
         most_recent = true
-    },
+    }
 }
 
-source "amazon-ebs" "{{user `image_name`}-ubuntu-1.0" {
+source "amazon-ebs" "{{user `image_name`}}-ubuntu-1.0" {
     instance_type = "t2.micro"
     encrypt_boot = true
     region = "eu-west-3"
@@ -42,5 +42,5 @@ source "amazon-ebs" "{{user `image_name`}-ubuntu-1.0" {
             "099720109477"
         ]
         most_recent = true
-    },
+    }
 }

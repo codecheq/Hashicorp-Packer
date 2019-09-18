@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/hashicorp/hcl2/hcl"
@@ -52,7 +53,6 @@ func isDir(path string) bool {
 }
 
 func (p *Parser) Parse(filename string) (*PackerConfig, hcl.Diagnostics) {
-	var cfg *PackerConfig
 	var diags hcl.Diagnostics
 
 	hclFiles := []string{}
@@ -72,11 +72,14 @@ func (p *Parser) Parse(filename string) (*PackerConfig, hcl.Diagnostics) {
 			diags = append(diags, diag)
 		}
 		for _, fileInfo := range fileInfos {
-			filename := fileInfo.Name()
+			if fileInfo.IsDir() {
+				continue
+			}
+			filename := filepath.Join(filename, fileInfo.Name())
 			if strings.HasSuffix(filename, hcl2FileExt) {
-				hclFiles = append(hclFiles, hcl2FileExt)
+				hclFiles = append(hclFiles, filename)
 			} else if strings.HasSuffix(filename, ".json") {
-				jsonFiles = append(jsonFiles, hcl2FileExt)
+				jsonFiles = append(jsonFiles, filename)
 			}
 		}
 	}
@@ -93,9 +96,10 @@ func (p *Parser) Parse(filename string) (*PackerConfig, hcl.Diagnostics) {
 		files = append(files, f)
 	}
 	if diags.HasErrors() {
-		return cfg, diags
+		return nil, diags
 	}
 
+	cfg := &PackerConfig{}
 	for _, file := range files {
 		moreDiags := p.ParseFile(file, cfg)
 		diags = append(diags, moreDiags...)
@@ -115,10 +119,6 @@ func (p *Parser) Parse(filename string) (*PackerConfig, hcl.Diagnostics) {
 // errors, since a partial result can be useful for careful analysis by
 // development tools such as text editor extensions.
 func (p *Parser) ParseFile(f *hcl.File, cfg *PackerConfig) hcl.Diagnostics {
-	if cfg == nil {
-		cfg = &PackerConfig{}
-	}
-
 	var diags hcl.Diagnostics
 
 	content, moreDiags := f.Body.Content(configSchema)

@@ -1,12 +1,12 @@
 
 // starts resources to provision them.
 build {
-    from src.amazon-ebs.ubuntu-1604 {
-        ami_name = "ami_name_blih_blah"
-        // this creates a new resource with settings inherited from the source  
+    from "src.amazon-ebs.ubuntu-1604" {
+        ami_name = "{{user `image_name`}-ubuntu-1.0"
     }
 
-    from src.virtualbox-iso.ubuntu-1204 {
+    from "src.virtualbox-iso.ubuntu-1204" {
+        // build name is defaulted from the label "src.virtualbox-iso.ubuntu-1204"
         outout_dir = "path/"
     }
 
@@ -33,6 +33,13 @@ build {
             timeout = "5s"
         }
 
+    }
+
+    post_provision {
+        amazon-import {
+            only = ["src.virtualbox-iso.ubuntu-1204"]
+            ami_name = "{{user `image_name`}-ubuntu-1.0"
+        }
     }
 }
 
