@@ -127,7 +127,7 @@ func (p *Parser) ParseFile(f *hcl.File, cfg *PackerConfig) hcl.Diagnostics {
 					Summary:  "Duplicate " + sourceLabel + " block",
 					Detail: fmt.Sprintf("This "+sourceLabel+" block has the "+
 						"same builder type and name as a previous block declared "+
-						"at %s. Each source must have a unique name per builder type.",
+						"at %s. Each "+sourceLabel+" must have a unique name per builder type.",
 						existing.HCL2Ref.DeclRange),
 					Subject: &source.HCL2Ref.DeclRange,
 				})

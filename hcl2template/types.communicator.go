@@ -1,6 +1,6 @@
 package hcl2template
 
-import ( 
+import (
 	"github.com/hashicorp/hcl2/hcl"
 	"github.com/hashicorp/hcl2/hcl/hclsyntax"
 )
@@ -15,19 +15,19 @@ type Communicator struct {
 }
 
 func (p *Parser) decodeCommunicatorConfig(block *hcl.Block) (*Communicator, hcl.Diagnostics) {
- 
- 	output := &Communicator{}
+
+	output := &Communicator{}
 	output.Type = block.Labels[0]
 	output.Name = block.Labels[1]
 	output.HCL2Ref.DeclRange = block.DefRange
 
-	 diags := hcl.Diagnostics {}
+	diags := hcl.Diagnostics{}
 
 	if !hclsyntax.ValidIdentifier(output.Name) {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
-			Summary:  "Invalid builder type",
-			Detail: "A " + sourceLabel + " type must start with a letter and " +
+			Summary:  "Invalid " + communicatorLabel + " type",
+			Detail: "A " + communicatorLabel + " type must start with a letter and " +
 				"may contain only letters, digits, underscores, and dashes.",
 			Subject: &block.DefRange,
 		})

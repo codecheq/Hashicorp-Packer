@@ -79,8 +79,8 @@ func sourceRefFromAbsTraversal(t hcl.Traversal) (SourceRef, hcl.Diagnostics) {
 	if len(t) != 3 {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
-			Summary:  "Invalid source reference",
-			Detail:   "An source reference must have three parts separated by periods: the keyword \"" + sourceLabel + "\", the builder type name, and the source name.",
+			Summary:  "Invalid " + sourceLabel + " reference",
+			Detail:   "A " + sourceLabel + " reference must have three parts separated by periods: the keyword \"" + sourceLabel + "\", the builder type name, and the source name.",
 			Subject:  t.SourceRange().Ptr(),
 		})
 		return NoSource, diags
@@ -89,7 +89,7 @@ func sourceRefFromAbsTraversal(t hcl.Traversal) (SourceRef, hcl.Diagnostics) {
 	if t.RootName() != sourceLabel {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
-			Summary:  "Invalid source reference",
+			Summary:  "Invalid " + sourceLabel + " reference",
 			Detail:   "The first part of an source reference must be the keyword \"" + sourceLabel + "\".",
 			Subject:  t[0].SourceRange().Ptr(),
 		})
@@ -99,8 +99,8 @@ func sourceRefFromAbsTraversal(t hcl.Traversal) (SourceRef, hcl.Diagnostics) {
 	if !ok {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
-			Summary:  "Invalid source reference",
-			Detail:   "The second part of an source reference must be an identifier giving the builder type of the source.",
+			Summary:  "Invalid " + sourceLabel + " reference",
+			Detail:   "The second part of an " + sourceLabel + " reference must be an identifier giving the builder type of the " + sourceLabel + ".",
 			Subject:  t[1].SourceRange().Ptr(),
 		})
 		return NoSource, diags
@@ -109,8 +109,8 @@ func sourceRefFromAbsTraversal(t hcl.Traversal) (SourceRef, hcl.Diagnostics) {
 	if !ok {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
-			Summary:  "Invalid source reference",
-			Detail:   "The third part of an source reference must be an identifier giving the name of the source.",
+			Summary:  "Invalid " + sourceLabel + " reference",
+			Detail:   "The third part of an " + sourceLabel + " reference must be an identifier giving the name of the " + sourceLabel + ".",
 			Subject:  t[2].SourceRange().Ptr(),
 		})
 		return NoSource, diags
