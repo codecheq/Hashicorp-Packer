@@ -13,8 +13,6 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/hashicorp/packer/hcl2template"
-
 	"github.com/hashicorp/packer/helper/enumflag"
 	"github.com/hashicorp/packer/packer"
 	"github.com/hashicorp/packer/template"
@@ -109,10 +107,6 @@ func isDir(path string) bool {
 	return s.IsDir()
 }
 
-func (c *BuildCommand) getHCL2Parser() *hcl2template.Parser {
-	return nil
-}
-
 func (c *BuildCommand) RunContext(buildCtx context.Context, args []string) int {
 	cfg, ret := c.ParseArgs(args)
 	if ret != 0 {
@@ -123,8 +117,7 @@ func (c *BuildCommand) RunContext(buildCtx context.Context, args []string) int {
 	// Parse the template
 	var tpl *template.Template
 	if strings.HasSuffix(cfg.Path, hcl2FileExt) || isDir(cfg.Path) {
-		hcl2Cfg := c.getHCL2Parser()
-		hcl2tpl, diags := hcl2Cfg.Parse(cfg.Path)
+		hcl2tpl, diags := c.Meta.CoreConfig.Parser.Parse(cfg.Path)
 		if diags.HasErrors() {
 			c.Ui.Error(fmt.Sprintf("Failed to parse template: %s", diags))
 			return 1
