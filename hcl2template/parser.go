@@ -3,7 +3,6 @@ package hcl2template
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -38,19 +37,6 @@ type Parser struct {
 }
 
 const hcl2FileExt = ".pkr.hcl"
-
-func isDir(path string) bool {
-	f, err := os.Open(path)
-	if err != nil {
-		return false
-	}
-	defer f.Close()
-	s, err := f.Stat()
-	if err != nil {
-		return false
-	}
-	return s.IsDir()
-}
 
 func (p *Parser) Parse(filename string) (*PackerConfig, hcl.Diagnostics) {
 	var diags hcl.Diagnostics
