@@ -203,11 +203,10 @@ func wrappedMain() int {
 		}
 	}
 
-	hcl2Parser := hcl2template.NewParser(config.Provisioners, config.PostProcessors)
 	// Create the CLI meta
 	CommandMeta = &command.Meta{
 		CoreConfig: &packer.CoreConfig{
-			Parser: hcl2Parser,
+			Parser: hcl2template.NewParser(config.Provisioners, config.PostProcessors),
 			Components: packer.ComponentFinder{
 				Builder:       config.LoadBuilder,
 				Hook:          config.LoadHook,
